@@ -1,15 +1,17 @@
 {
 	"compilerOptions": {
+		"importHelpers": true,
 		"moduleResolution": "node",
 		"target": "esnext",
 		"module": "commonjs",
-		"lib": ["esnext", "dom"],
+		"lib": ["esnext"],
 		"strict": true,
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"outDir": "dist",
+		"declaration": true,
+		"declarationDir": "types",
 		"typeRoots": ["node_modules/@types"]
 	},
 	"include": ["src", "test", "index.d.ts"],

@@ -3,6 +3,8 @@
 /.nyc_output
 /dist
 /lib
+/types
 /tmp
 /yarn.lock
+/.rpt2_cache
 node_modules
