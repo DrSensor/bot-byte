@@ -3,9 +3,6 @@
 	"description": "An abstraction layer for creating Byteball bot",
 	"version": "0.0.0",
 	"author": "Fahmi Akbar Wildana @DrSensor",
-	"bin": {
-		"botbyte": "./bin/run"
-	},
 	"bugs": "https://github.com/DrSensor/bot-byte/issues",
 	"dependencies": {
 		"@oclif/command": "^1.5.6",
@@ -48,6 +45,7 @@
 		"rollup-plugin-json": "^3.1.0",
 		"rollup-plugin-node-resolve": "^4.0.0",
 		"rollup-plugin-prettier": "^0.5.0",
+		"rollup-plugin-run": "git+https://github.com/DrSensor/rollup-plugin-run.git",
 		"rollup-plugin-shim": "^1.0.0",
 		"rollup-plugin-typescript2": "^0.18.1",
 		"shx": "^0.3.2",
@@ -63,7 +61,7 @@
 	},
 	"files": [
 		"/bin",
-		"/lib",
+		"/dist",
 		"/npm-shrinkwrap.json",
 		"/oclif.manifest.json"
 	],
@@ -88,14 +86,16 @@
 			"precommit": "git add CHANGELOG.md package*.json"
 		}
 	},
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
+	"main": "dist/index.js",
+	"types": "types/index.d.ts",
+	"bin": {
+		"botbyte": "./bin/run"
+	},
 	"oclif": {
-		"commands": "./lib/commands",
+		"commands": "./dist/commands",
 		"bin": "botbyte",
 		"plugins": [
-			"@oclif/plugin-help",
-			"@oclif/plugin-plugins"
+			"@oclif/plugin-help"
 		]
 	},
 	"repository": "DrSensor/bot-byte",
@@ -111,8 +111,8 @@
 		"lint:fix": "tslint -p . --fix --force",
 		"postpack": "rm -f oclif.manifest.json",
 		"posttest": "tslint -p . -t stylish",
-		"prebuild": "(shx rm -r lib .rpt2_cache types) || true",
-		"prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+		"prebuild": "(shx rm -r dist .rpt2_cache types) || true",
+		"prepack": "rm -rf dist && tsc -b && oclif-dev manifest && oclif-dev readme",
 		"prepublishOnly": "npm run build",
 		"prestart": "npm run prebuild",
 		"pretest": "npm run build",

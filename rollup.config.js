@@ -8,6 +8,7 @@ import nodeResolve from "rollup-plugin-node-resolve"
 import json from "rollup-plugin-json"
 import shim from "rollup-plugin-shim"
 import alias from "rollup-plugin-alias"
+import run from "rollup-plugin-run"
 import babel from "rollup-plugin-babel"
 import prettier from "rollup-plugin-prettier"
 import typescript from "rollup-plugin-typescript2"
@@ -18,39 +19,27 @@ const prettierrc = {
 	options: options,
 	files: files => overrides.find(p => p.files === files).options
 }
+const dev = process.env.ROLLUP_WATCH === 'true'
 // #endregion
 
-/** TODO:
- * use https://oclif.io/docs/base_class
- * follow up with https://oclif.io/docs/running_programmatically
- * finally use rollup-plugin-multi-entry to be able to use watch mode
- */ 
-// Rollup Configuration
-export default [{
-	input: glob([
-		"src/index.ts",
-		"src/commands/*.ts"
-	]),
-	output: {
-		dir: dirname(pkg.main),
+// Default Configuration
+const configure = ({input, output, watch, ...others}) => ({
+	input,
+	output: Object.assign({
 		format: "cjs",
+		// why oclif, why!! 😂 https://github.com/oclif/config/commit/5854d34
+		chunkFileNames: "[name]-[hash].spec.js",
 		exports: "named"
-	},
+	}, output),
 	experimentalCodeSplitting: true,
-	// 👇 I wonder if I can convert it as a plugin like auto external 🤔
+	watch: {
+		clearScreen: false
+	},
+	// 👇 I wonder if I can convert it as a plugin like rollup-plugin-auto-external 🤔
 	external: id => /byteballcore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
-	// 👆
 	plugins: [
+		dev && run({ bin: pkg.bin[pkg.name] }),
 		json(),
-		typescript({
-			exclude: ["test/**"],
-			tsconfigOverride: {
-				compilerOptions: {
-					module: "esnext"
-				}
-			},
-			useTsconfigDeclarationDir: true
-		}),
 		alias({
 			resolve: [".ts"],
 			readline: resolve("./src/shim-readline")
@@ -60,8 +49,31 @@ export default [{
 			os: "export const hostname = () => require('byteballcore/conf.js').deviceName"
 		}),
 		babel(),
-		commonjs(),
 		nodeResolve(),
-		prettier(prettierrc.files("*.js"))
-	]
-}]
+		commonjs({ignore: id => id !== "readline"}),
+		typescript({
+			exclude: ["test/**"],
+			tsconfigOverride: {
+				compilerOptions: {
+					module: "esnext"
+				}
+			},
+			// rollupCommonJSResolveHack: true, // seems he has fix it 🎉
+			useTsconfigDeclarationDir: true
+		}),
+		prettier(prettierrc.files("*.js")),
+	],
+	...others,
+})
+
+// Rollup Configuration
+export default [
+	configure({
+		input: glob("src/commands/*.ts"),
+		output: {dir: dirname(pkg.main) + "/commands"},
+	}),
+	configure({
+		input: "src/index.ts",
+		output: {file: pkg.main},
+	})
+]

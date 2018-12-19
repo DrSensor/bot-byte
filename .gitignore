@@ -7,4 +7,5 @@
 /tmp
 /yarn.lock
 /.rpt2_cache
+!/bin
 node_modules
