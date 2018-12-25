@@ -41,7 +41,7 @@ const configure = ({input, output, watch, ...others}) => ({
 	input,
 	output: Object.assign({
 		format: "cjs",
-		exports: "named"
+		exports: "default"
 	}, output),
 	experimentalCodeSplitting: true,
 	watch: {clearScreen: false},
