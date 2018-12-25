@@ -11,6 +11,7 @@
 		"@oclif/plugin-help": "^2.1.4",
 		"@oclif/plugin-plugins": "^1.7.3",
 		"byteballcore": "git+https://github.com/byteball/byteballcore.git",
+		"strict-event-emitter-types": "^2.0.0",
 		"tslib": "^1.9.3"
 	},
 	"devDependencies": {

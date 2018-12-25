@@ -14,10 +14,7 @@ export default class Run extends Command {
   static args = [{name: 'file'}]
 
   async run() {
-    const wallet = await import('headless-byteball')
     const {args, flags} = this.parse(Run)
-
-    wallet.setupChatEventHandlers()
 
     const name = flags.name || 'world'
     this.log(`hello ${name} from /home/wildan/Projects/OSS/bot-byte/src/commands/run.ts`)

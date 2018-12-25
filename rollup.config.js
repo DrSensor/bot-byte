@@ -1,4 +1,4 @@
-import {dirname, resolve} from "path"
+import {dirname, resolve, parse} from "path"
 import {sync as glob} from "globby"
 import pkg from "./package.json"
 import prc from "./.prettierrc.json"
@@ -20,6 +20,20 @@ const prettierrc = {
 	files: files => overrides.find(p => p.files === files).options
 }
 const dev = process.env.ROLLUP_WATCH === 'true'
+const mapInput = inputs => {
+	const result = {}
+	for (const key in inputs) {
+		if (!key.includes('*')) Object.assign(result, {[key]: inputs[key]})
+		else { // support glob pattern
+			const [prefix, suffix] = key.split('*')
+			const input = glob(inputs[key]).reduce(
+				(obj, item) => (obj[`${prefix}/${parse(item).name}${suffix}`] = item, obj), {}
+			)
+			Object.assign(result, input)
+		}
+	}
+	return result
+}
 // #endregion
 
 // Default Configuration
@@ -27,14 +41,10 @@ const configure = ({input, output, watch, ...others}) => ({
 	input,
 	output: Object.assign({
 		format: "cjs",
-		// why oclif, why!! 😂 https://github.com/oclif/config/commit/5854d34
-		chunkFileNames: "[name]-[hash].spec.js",
 		exports: "named"
 	}, output),
 	experimentalCodeSplitting: true,
-	watch: {
-		clearScreen: false
-	},
+	watch: {clearScreen: false},
 	// 👇 I wonder if I can convert it as a plugin like rollup-plugin-auto-external 🤔
 	external: id => /byteballcore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
 	plugins: [
@@ -43,7 +53,7 @@ const configure = ({input, output, watch, ...others}) => ({
 		alias({
 			resolve: [".ts"],
 			readline: resolve("./src/shim-readline")
-			// 🤔 I'm still uncertain if I need to shim the readline or stdin/stdout 
+			// 🤔 I'm still uncertain if I need to shim the readline or the stdin/stdout
 		}),
 		shim({
 			os: "export const hostname = () => require('byteballcore/conf.js').deviceName"
@@ -58,7 +68,6 @@ const configure = ({input, output, watch, ...others}) => ({
 					module: "esnext"
 				}
 			},
-			// rollupCommonJSResolveHack: true, // seems he has fix it 🎉
 			useTsconfigDeclarationDir: true
 		}),
 		prettier(prettierrc.files("*.js")),
@@ -69,11 +78,13 @@ const configure = ({input, output, watch, ...others}) => ({
 // Rollup Configuration
 export default [
 	configure({
-		input: glob("src/commands/*.ts"),
-		output: {dir: dirname(pkg.main) + "/commands"},
-	}),
-	configure({
-		input: "src/index.ts",
-		output: {file: pkg.main},
+		input: mapInput({
+			index: "src/index.ts",
+			"commands/*": "src/commands/*.ts"
+		}),
+		output: {
+			dir: dirname(pkg.main),
+			chunkFileNames: "chunks/[name]-[hash].js"
+		},
 	})
 ]

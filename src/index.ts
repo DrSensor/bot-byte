@@ -1,8 +1,3 @@
-import {run} from '@oclif/command'
+import {EventEmitter} from 'events'
 
-if (require.main === module) {
-  run()
-    .then(require('@oclif/command/flush'))
-    // @ts-ignore miss error
-    .catch(require('@oclif/errors/handle'))
-}
+export default class Bot extends EventEmitter {}
