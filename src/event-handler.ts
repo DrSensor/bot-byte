@@ -1,3 +1,7 @@
+/**
+ * This file implement all custom event handler which not base on EventEmitter
+ * mostly it's for shimming
+ */
 type Response = string | void
 type Callback = (query?: string) => (Response | Promise<Response>)
 type EventHandler<T extends string> = { [key in T]?: Callback }
@@ -26,7 +30,7 @@ export const bot: Event = {
  * and each handler support both normal and async function
  */
 export default {
-  started: (callback: Callback) => (bot.started = callback),
-  onAsking: (question: Question, callback: Callback) => (bot.onAsking[question] = callback),
-  onError: (event: ErrorEvent, callback: Callback) => (bot.onError[event] = callback)
+  started: (callback: Callback) => { bot.started = callback },
+  onAsking: (question: Question, callback: Callback) => { bot.onAsking[question] = callback },
+  onError: (event: ErrorEvent, callback: Callback) => { bot.onError[event] = callback }
 }

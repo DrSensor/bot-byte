@@ -16,10 +16,11 @@ export function createInterface(_options: ReadLineOptions) {
       const questionIncludes = (keywords: string[]) => keywords.every(keyword => query.includes(keyword))
       // #endregion helpers
 
+      // in case someone register started event as async function
       Promise.resolve(bot.started(query)).then(async () => {
         if (questionIncludes(['passphrase'])) answering(await on('passphrase'))
         else if (questionIncludes(['device', 'name'])) answering(await on('devicename'))
-        else answering()
+        else answering(undefined)
       }).catch(bot.onError.started)
     }
   }
