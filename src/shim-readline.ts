@@ -1,3 +1,4 @@
+import conf from 'byteballcore/conf'
 import {ReadLineOptions} from 'readline'
 
 import {bot, Question} from './event-handler'
@@ -12,7 +13,10 @@ export function createInterface(_options: ReadLineOptions) {
     question(query: string, answering: (response: string | void) => void) {
       // #region helpers
       query = query.toLocaleLowerCase()
-      const on = (event: Question) => Promise.resolve(bot.onAsking[event]!())
+      const on = (event: Question) => {
+        const cb = bot.onAsking[event]
+        return Promise.resolve(cb ? cb() : conf.devicename)
+      }
       const questionIncludes = (keywords: string[]) => keywords.every(keyword => query.includes(keyword))
       // #endregion helpers
 

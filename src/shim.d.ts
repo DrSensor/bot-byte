@@ -13,10 +13,6 @@ declare module 'headless-byteball' {
   export const issueChangeAddressAndSendPayment: Wallet.issueChangeAddressAndSendPayment
 }
 
-declare module 'byteballcore/conf' {
-  export const deviceName: string
-}
-
 interface Device {
   sendMessageToDevice(
     device_address: string,

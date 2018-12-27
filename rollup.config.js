@@ -41,7 +41,7 @@ const configure = ({input, output, watch, ...others}) => ({
 	input,
 	output: Object.assign({
 		format: "cjs",
-		exports: "default"
+		exports: "named"
 	}, output),
 	experimentalCodeSplitting: true,
 	watch: {clearScreen: false},
@@ -54,9 +54,6 @@ const configure = ({input, output, watch, ...others}) => ({
 			resolve: [".ts"],
 			readline: resolve("./src/shim-readline")
 			// 🤔 I'm still uncertain if I need to shim the readline or the stdin/stdout
-		}),
-		shim({
-			os: "export const hostname = () => require('byteballcore/conf.js').deviceName"
 		}),
 		babel(),
 		nodeResolve(),
