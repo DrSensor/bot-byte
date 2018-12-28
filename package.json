@@ -1,7 +1,7 @@
 {
 	"name": "botbyte",
 	"description": "An abstraction layer for creating Byteball bot",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"author": "Fahmi Akbar Wildana @DrSensor",
 	"bugs": "https://github.com/DrSensor/bot-byte/issues",
 	"dependencies": {
@@ -59,26 +59,15 @@
 	"engines": {
 		"node": ">=8.0.0"
 	},
-	"files": [
-		"/bin",
-		"/dist",
-		"/npm-shrinkwrap.json",
-		"/oclif.manifest.json"
-	],
+	"files": ["/bin", "/dist", "/npm-shrinkwrap.json", "/oclif.manifest.json"],
 	"homepage": "https://github.com/DrSensor/bot-byte",
-	"keywords": [
-		"oclif"
-	],
+	"keywords": ["oclif"],
 	"license": "MIT",
 	"lint-staged": {
 		"linters": {
-			"*.ts": [
-				"tslint --fix -c tslint.json -p tsconfig.json"
-			]
+			"*.ts": ["tslint --fix -c tslint.json -p tsconfig.json"]
 		},
-		"ignore": [
-			"examples/**"
-		]
+		"ignore": ["examples/**"]
 	},
 	"standard-version": {
 		"scripts": {
@@ -94,9 +83,7 @@
 	"oclif": {
 		"commands": "./dist/commands",
 		"bin": "botbyte",
-		"plugins": [
-			"@oclif/plugin-help"
-		]
+		"plugins": ["@oclif/plugin-help"]
 	},
 	"repository": "DrSensor/bot-byte",
 	"scripts": {
