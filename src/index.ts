@@ -2,25 +2,27 @@ import {EventEmitter} from 'events'
 import Typed from 'strict-event-emitter-types'
 
 import HWallet from './event-handler'
-import {IBot} from './event-types'
+import {IBot, IOption} from './event-types'
+import setOption from './options'
 
 type EventType<T> = Typed<EventEmitter, T>
 
 // TODO: map to https://github.com/byteball/reddit-attestation/blob/master/index.js
 
-export default class Bot extends (EventEmitter as { new(): EventType<IBot> }) {
+export class Bot extends (EventEmitter as { new(): EventType<IBot> }) {
+  static get instance() { return HWallet }
+  static setOption = setOption
+
   private _device?: Device
   private _wallet?: Wallet
 
-  constructor() {
+  constructor(option?: Partial<IOption>) {
     super()
-    // #region still doubting 🤔 do I need to simplify this? (and how!)
-    HWallet.started(() => { this.emit('init') })
-    HWallet.onAsking('passphrase', () => { this.emit('passphrase') })
-    // #endregion
+    if (option) Bot.setOption(option)
   }
 
   private async init() {
+    /// use of `await import` is for module thaat immediately run a service 😓
     this._wallet = await import('headless-byteball')
     this._device = await import('byteballcore/device')
     const eventBus = require('byteballcore/event_bus')
