@@ -19,6 +19,20 @@ export class Bot extends (EventEmitter as { new(): EventType<IBot> }) {
   constructor(option?: Partial<IOption>) {
     super()
     if (option) Bot.setOption(option)
+
+    this.init().then(events => { // mapping events from https://developer.byteball.org/list-of-events
+      events.on('text', (...r) => this.emit('message', {
+        from_address: r[0],
+        text: r[1],
+        count: r[2],
+        response: (txt: string) => this.sendMessage(r[0], txt)
+      }))
+    }).catch(err => this.emit('error', err))
+  }
+
+  sendMessage(to_address: string, message: string) {
+    if (!this._device) throw new Error('Bot not ready')
+    else this._device.sendMessageToDevice(to_address, 'text', message)
   }
 
   private async init() {
