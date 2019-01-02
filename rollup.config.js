@@ -42,7 +42,6 @@ const configure = ({input, output, watch, ...others}) => ({
 		format: "cjs",
 		exports: "named"
 	}, output),
-	experimentalCodeSplitting: true,
 	watch: {clearScreen: false},
 	// 👇 I wonder if I can convert it as a plugin like rollup-plugin-auto-external 🤔
 	external: id => /byteballcore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
