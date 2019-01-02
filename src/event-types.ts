@@ -37,11 +37,3 @@ export interface IBot {
   message(message: IMessage): void
   error(error: Error): void
 }
-
-import conf from 'byteballcore/conf'
-import constants from 'byteballcore/constants'
-export interface IOption {
-  testnet: boolean
-  constants: typeof constants
-  conf: typeof conf
-}

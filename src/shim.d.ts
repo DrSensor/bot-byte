@@ -1,4 +1,13 @@
+type PlainObject<T> = {
+  // constructor: ObjectConstructor
+  [key: string]: T
+}
+type LazyImport<T> = { [key: string]: T }
+type AnyFunc = (...args: any) => any
+type NonFunc = string | number | string[] | number[] | PlainObject<NonFunc>
+
 interface Wallet {
+  signer: string
   setupChatEventHandlers()
   issueChangeAddressAndSendPayment(
     asset: string | null,
@@ -6,11 +15,11 @@ interface Wallet {
     user_byteball_address: string,
     user_device_address?: string,
     calback: (err: Error, unit: number) => void
-  )
+    )
+  readSingleAddress(cb: (address: string) => void)
 }
 declare module 'headless-byteball' {
-  export const setupChatEventHandlers: any
-  export const issueChangeAddressAndSendPayment: Wallet.issueChangeAddressAndSendPayment
+  export default Wallet
 }
 
 interface Device {
@@ -23,7 +32,7 @@ interface Device {
   )
 }
 declare module 'byteballcore/device' {
-  export const sendMessageToDevice: Device.sendMessageToDevice
+  export default Device
 }
 
 declare module 'byteballcore/event_bus' {
@@ -33,6 +42,6 @@ declare module 'byteballcore/event_bus' {
 }
 
 declare module 'byteballcore/*' {
-  const _: any
+  const _: PlainObject<any>
   export default _
 }
