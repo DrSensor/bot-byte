@@ -1,3 +1,6 @@
+/** TODO: bundler tricks
+ * 🔇 shim the console.log on both `bytebeallcore` and `headless-wallet`
+ */
 import {dirname, resolve, parse} from "path"
 import {sync as glob} from "globby"
 import pkg from "./package.json"

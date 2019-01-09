@@ -15,6 +15,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * implement basic Bot class ([6160746](https://github.com/DrSensor/bot-byte/commit/6160746))
 * **lib:** able to setoption before instantiates ([7b2710f](https://github.com/DrSensor/bot-byte/commit/7b2710f))
-* **lib:** add event for recieve response message ([0406380](https://github.com/DrSensor/bot-byte/commit/0406380))
+* **lib:** add event for receive response message ([0406380](https://github.com/DrSensor/bot-byte/commit/0406380))
 * **lib:** group database, pairing, payment events ([2c4f947](https://github.com/DrSensor/bot-byte/commit/2c4f947))
 * **lifecycle:** add register event handler️ ⌛️ ([69cd2f0](https://github.com/DrSensor/bot-byte/commit/69cd2f0))

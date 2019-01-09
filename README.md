@@ -22,7 +22,7 @@ $ npm install -g botbyte
 $ botbyte COMMAND
 running command...
 $ botbyte (-v|--version|version)
-botbyte/0.0.0 linux-x64 node-v10.14.1
+botbyte/0.1.0 linux-x64 node-v10.14.1
 $ botbyte --help [COMMAND]
 USAGE
   $ botbyte COMMAND
@@ -31,7 +31,6 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`botbyte hello [FILE]`](#botbyte-hello-file)
 * [`botbyte help [COMMAND]`](#botbyte-help-command)
 * [`botbyte new [FILE]`](#botbyte-new-file)
 * [`botbyte run [FILE]`](#botbyte-run-file)
@@ -67,7 +66,7 @@ OPTIONS
   -n, --name=name  name to print
 ```
 
-_See code: [src/commands/new.ts](https://github.com/DrSensor/bot-byte/blob/v0.0.0/src/commands/new.ts)_
+_See code: [dist/commands/new.ts](https://github.com/DrSensor/bot-byte/blob/v0.1.0/dist/commands/new.ts)_
 
 ## `botbyte run [FILE]`
 
@@ -83,5 +82,5 @@ OPTIONS
   -n, --name=name  name to print
 ```
 
-_See code: [src/commands/run.ts](https://github.com/DrSensor/bot-byte/blob/v0.0.0/src/commands/run.ts)_
+_See code: [dist/commands/run.ts](https://github.com/DrSensor/bot-byte/blob/v0.1.0/dist/commands/run.ts)_
 <!-- commandsstop -->
