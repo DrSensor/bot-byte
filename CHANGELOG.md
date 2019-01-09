@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/DrSensor/bot-byte/compare/v0.1.0...v0.2.0) (2019-01-09)
+
+
+### Features
+
+* **lib:** add createAttestation() ([3ee9d84](https://github.com/DrSensor/bot-byte/commit/3ee9d84))
+* **lib:** add payment related event & function 💵 ([df02201](https://github.com/DrSensor/bot-byte/commit/df02201))
+
+
+### Reverts
+
+* **lib:** bring back "must need conf.js" ([78c20ae](https://github.com/DrSensor/bot-byte/commit/78c20ae))
+
+
+
 <a name="0.1.0"></a>
 # 0.1.0 (2018-12-28)
 
