@@ -17,6 +17,10 @@ export enum TESTNET {
   attestedInDefinitionUpgradeMci = 616000,
   altBranchByBestParentUpgradeMci = 642000,
   //#endregion
+
+  //#region botbyte
+  explorer = 'https://testnetexplorer.byteball.org/#',
+  //#endregion
 }
 
 export enum LIVENET {
@@ -36,6 +40,10 @@ export enum LIVENET {
   attestedInDefinitionUpgradeMci = spendUnconfirmedUpgradeMci,
   altBranchByBestParentUpgradeMci = 3009824,
   //#endregion
+
+  //#region botbyte
+  explorer = 'https://explorer.byteball.org/#',
+  //#endregion
 }
 
 // #region Database config
@@ -43,7 +51,7 @@ export enum LIVENET {
  * @see https://github.com/byteball/byteballcore/blob/master/conf.js#L105-L116
  */
 interface IDatabase {
-  max_connections: number
+  max_connections?: number
 }
 
 interface IMySql extends IDatabase {
