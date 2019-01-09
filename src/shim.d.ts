@@ -1,3 +1,4 @@
+//#region helpers type
 type PlainObject<T> = {
   // constructor: ObjectConstructor
   [key: string]: T
@@ -5,6 +6,8 @@ type PlainObject<T> = {
 type LazyImport<T> = { [key: string]: T }
 type AnyFunc = (...args: any) => any
 type NonFunc = string | number | string[] | number[] | PlainObject<NonFunc>
+type TaggedTemplateLiterals = (str: TemplateStringsArray, ...keys: any[]) => string
+//#endregion
 
 interface Wallet {
   signer: string
@@ -17,6 +20,7 @@ interface Wallet {
     calback: (err: Error, unit: number) => void
     )
   readSingleAddress(cb: (address: string) => void)
+  readFirstAddress(cb: (address: string) => void)
 }
 declare module 'headless-byteball' {
   export default Wallet
@@ -33,6 +37,11 @@ interface Device {
 }
 declare module 'byteballcore/device' {
   export default Device
+}
+
+declare module 'byteballcore/desktop_app' {
+  export const getAppDataDir: () => string
+  export const getAppRootDir: () => string
 }
 
 declare module 'byteballcore/event_bus' {

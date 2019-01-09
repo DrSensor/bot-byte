@@ -6,9 +6,10 @@ export interface IPairing {
 
 export interface IPayment {
   send(unit: number, error: Error): void
-  recieve(arrNewUnits: number[]): void // #new_private_payment
-  confirm(arrUnits: number[]): void // #my_transactions_became_stable
-  'private:recieve'(// #received_payment
+  reject(from_address: string, error: string): void
+  receive(from_address: string, amount: number, arrNewUnits: string[]): void // #new_my_transactions
+  confirm(from_address: string, amount: number, arrUnits: string[]): void // #my_transactions_became_stable
+  'private:receive'(// #received_payment
     payer_device_address: string,
     assocAmountsByAsset: string,
     asset: string,
