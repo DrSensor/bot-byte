@@ -1,4 +1,4 @@
-import conf from 'byteballcore/conf'
+import conf from 'ocore/conf'
 import {ReadLineOptions} from 'readline'
 
 import {bot, Question} from './event-handler'

@@ -10,7 +10,7 @@
 		"@oclif/errors": "^1.2.2",
 		"@oclif/plugin-help": "^2.1.4",
 		"@oclif/plugin-plugins": "^1.7.3",
-		"byteballcore": "git+https://github.com/byteball/byteballcore.git",
+		"ocore": "github:byteball/ocore",
 		"strict-event-emitter-types": "^2.0.0",
 		"tslib": "^1.9.3"
 	},
@@ -33,7 +33,7 @@
 		"babel-jest": "^23.6.0",
 		"conventional-github-releaser": "^3.1.2",
 		"globby": "^8.0.1",
-		"headless-byteball": "git+https://github.com/byteball/headless-byteball.git",
+		"headless-obyte": "github:byteball/headless-obyte",
 		"husky": "^1.3.1",
 		"jest": "^23.6.0",
 		"jest-silent-reporter": "^0.1.1",
@@ -67,13 +67,19 @@
 		"/oclif.manifest.json"
 	],
 	"homepage": "https://github.com/DrSensor/bot-byte",
-	"keywords": ["oclif"],
+	"keywords": [
+		"oclif"
+	],
 	"license": "MIT",
 	"lint-staged": {
 		"linters": {
-			"*.ts": ["tslint --fix -c tslint.json -p tsconfig.json"]
+			"*.ts": [
+				"tslint --fix -c tslint.json -p tsconfig.json"
+			]
 		},
-		"ignore": ["examples/**"]
+		"ignore": [
+			"examples/**"
+		]
 	},
 	"standard-version": {
 		"scripts": {
@@ -89,7 +95,9 @@
 	"oclif": {
 		"commands": "./dist/commands",
 		"bin": "botbyte",
-		"plugins": ["@oclif/plugin-help"]
+		"plugins": [
+			"@oclif/plugin-help"
+		]
 	},
 	"repository": "DrSensor/bot-byte",
 	"scripts": {

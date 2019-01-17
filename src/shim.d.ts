@@ -22,7 +22,7 @@ interface Wallet {
   readSingleAddress(cb: (address: string) => void)
   readFirstAddress(cb: (address: string) => void)
 }
-declare module 'headless-byteball' {
+declare module 'headless-obyte' {
   export default Wallet
 }
 
@@ -32,25 +32,25 @@ interface Device {
     subject: 'text', // TODO: get full subject type
     body: string,
     callbacks?: () => void,
-    conn?: any // TODO: need to create dts of https://github.com/byteball/byteballcore/blob/master/db.js
+    conn?: any // TODO: need to create dts of https://github.com/byteball/ocore/blob/master/db.js
   )
 }
-declare module 'byteballcore/device' {
+declare module 'ocore/device' {
   export default Device
 }
 
-declare module 'byteballcore/desktop_app' {
+declare module 'ocore/desktop_app' {
   export const getAppDataDir: () => string
   export const getAppRootDir: () => string
 }
 
-declare module 'byteballcore/event_bus' {
+declare module 'ocore/event_bus' {
   import {EventEmitter} from 'events'
   const event: EventEmitter
   export default event
 }
 
-declare module 'byteballcore/*' {
+declare module 'ocore/*' {
   const _: PlainObject<any>
   export default _
 }

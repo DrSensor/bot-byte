@@ -47,7 +47,7 @@ const configure = ({input, output, watch, ...others}) => ({
 	}, output),
 	watch: {clearScreen: false},
 	// 👇 I wonder if I can convert it as a plugin like rollup-plugin-auto-external 🤔
-	external: id => /byteballcore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
+	external: id => /ocore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
 	plugins: [
 		dev && run({ bin: pkg.bin[pkg.name] }),
 		json(),

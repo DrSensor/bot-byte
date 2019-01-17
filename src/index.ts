@@ -1,5 +1,5 @@
-import {getAppDataDir, getAppRootDir} from 'byteballcore/desktop_app'
 import {EventEmitter} from 'events'
+import {getAppDataDir, getAppRootDir} from 'ocore/desktop_app'
 import {dirname} from 'path'
 import Typed from 'strict-event-emitter-types'
 
@@ -42,7 +42,7 @@ export class Bot extends (EventEmitter as new() => EventType<IBot>) {
     // db: LazyImport<any> // TODO: use it if there is side-effect
   }
 
-  private readonly db = require('byteballcore/db')
+  private readonly db = require('ocore/db')
 
   constructor(option?: Partial<IOption>) {
     super()
@@ -175,16 +175,16 @@ export class Bot extends (EventEmitter as new() => EventType<IBot>) {
   private async init() {
     /// use of `await import` is for module thaat immediately run a service 😓
     this.core = {
-      wallet: await import('headless-byteball') as Wallet,
-      device: await import('byteballcore/device') as Device,
-      composer: await import('byteballcore/composer'),
-      network: await import('byteballcore/network')
+      wallet: await import('headless-obyte') as Wallet,
+      device: await import('ocore/device') as Device,
+      composer: await import('ocore/composer'),
+      network: await import('ocore/network')
     }
-    const eventBus = require('byteballcore/event_bus')
+    const eventBus = require('ocore/event_bus')
     return new Promise<EventEmitter>(async resolve => {
       eventBus.once('headless_wallet_ready', () => {
         this.core!.wallet.setupChatEventHandlers()
-        this.core!.wallet.readFirstAddress(address => {
+        this.core!.wallet.readSingleAddress(address => {
           this.address = address
           this.emit('ready', this.core!.device)
           resolve(eventBus)

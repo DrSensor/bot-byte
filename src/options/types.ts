@@ -48,7 +48,7 @@ export enum LIVENET {
 
 // #region Database config
 /**
- * @see https://github.com/byteball/byteballcore/blob/master/conf.js#L105-L116
+ * @see https://github.com/byteball/ocore/blob/master/conf.js#L105-L116
  */
 interface IDatabase {
   max_connections?: number
@@ -75,7 +75,7 @@ interface IConfWallet {
 }
 
 /**
- * @see  https://github.com/byteball/byteballcore/blob/master/conf.js
+ * @see  https://github.com/byteball/ocore/blob/master/conf.js
  */
 export interface IConf extends IConfWallet {
   port: number | null
@@ -98,7 +98,7 @@ export interface IConf extends IConfWallet {
 }
 
 /**
- * @see https://github.com/byteball/byteballcore/blob/master/constants.js
+ * @see https://github.com/byteball/ocore/blob/master/constants.js
  */
 export interface IConstants {
   version: TESTNET.version | string
