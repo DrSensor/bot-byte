@@ -1,0 +1,34 @@
+{
+  "name": "@obot/cli",
+  "version": "0.2.1",
+  "description": "A CLI to help you creating Byteball chatbot",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+		"/bin",
+		"/dist",
+		"/types",
+		"/oclif.manifest.json"
+  ],
+  "bin": {
+		"obot": "./bin/run"
+	},
+	"oclif": {
+		"commands": "./dist/commands",
+		"bin": "obot",
+		"plugins": [
+			"@oclif/plugin-help"
+		]
+  },
+  "repository": "github:DrSensor/bot-byte",
+  "homepage": "https://drsensor.github.io/bot-byte",
+  "keywords": ["obyte", "chatbot", "cli"],
+  "author": "Fahmi Akbar Wildana @DrSensor",
+  "license": "MIT",
+  "dependencies": {
+    "@oclif/command": "^1.5.8",
+    "@oclif/config": "^1.12.0",
+    "@oclif/errors": "^1.2.2",
+    "@oclif/plugin-help": "^2.1.4"
+  }
+}

@@ -1,7 +1,9 @@
+!/packages/*
+!/packages/cli/bin
 *-debug.log
 *-error.log
 /.nyc_output
-/dist
+dist
 /lib
 /types
 /tmp
