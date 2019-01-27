@@ -33,7 +33,7 @@
 		"rollup-plugin-commonjs": "^9.2.0",
 		"rollup-plugin-json": "^3.1.0",
 		"rollup-plugin-node-resolve": "^4.0.0",
-		"rollup-plugin-run": "git+https://github.com/DrSensor/rollup-plugin-run.git",
+		"rollup-plugin-run": "github:DrSensor/rollup-plugin-run",
 		"rollup-plugin-typescript2": "^0.18.1",
 		"shx": "^0.3.2",
 		"standard-version": "^4.4.0",
@@ -61,8 +61,8 @@
 		}
 	},
 	"scripts": {
-		"bootstrap": "lerna bootstrap && npm install",
-		"build": "lerna exec -- rollup -c ../../rollup.config.js --silent",
+		"bootstrap": "npm install && lerna bootstrap",
+		"build": "lerna exec -- rollup -c --silent",
 		"ci:coverage": "jest --collectCoverageFrom='src/**/*.ts' --coverage --runInBand --silent --ci",
 		"ci:lint": "tsc --pretty -p . --noemit && tslint -p .",
 		"ci:lint:commits": "commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}",
@@ -82,7 +82,7 @@
 		"release:as": "standard-version --skip.commit --skip.tag --release-as",
 		"release:ok": "standard-version --sign --commit-all --skip.bump --skip.changelog",
 		"release:validate": "commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)",
-		"start": "lerna exec --no-bail -- rollup -c ../../rollup.config.js --watch",
+		"start": "lerna exec --no-bail -- rollup -c --silent --watch",
 		"test": "jest --watch",
 		"test:once": "jest",
 		"test:coverage": "jest --collectCoverageFrom='src/**/*.ts' --coverage",
