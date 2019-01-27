@@ -5,9 +5,9 @@
 /.nyc_output
 dist
 /lib
-/types
+types
 /tmp
 /yarn.lock
-/.rpt2_cache
+.rpt2_cache
 !/bin
 node_modules

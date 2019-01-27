@@ -12,6 +12,7 @@
 		"@commitlint/config-conventional": "^7.1.2",
 		"@oclif/dev-cli": "^1.21.0",
 		"@oclif/tslint": "^3.1.1",
+		"@rollup/log": "^0.1.0",
 		"@types/chai": "^4.1.7",
 		"@types/jest": "^23.3.10",
 		"@types/mocha": "^5.2.5",
@@ -32,7 +33,6 @@
 		"rollup-plugin-commonjs": "^9.2.0",
 		"rollup-plugin-json": "^3.1.0",
 		"rollup-plugin-node-resolve": "^4.0.0",
-		"rollup-plugin-prettier": "^0.5.0",
 		"rollup-plugin-run": "git+https://github.com/DrSensor/rollup-plugin-run.git",
 		"rollup-plugin-typescript2": "^0.18.1",
 		"shx": "^0.3.2",
@@ -61,8 +61,8 @@
 		}
 	},
 	"scripts": {
-		"bootstrap": "lerna bootstrap --hoist",
-		"build": "rollup -c",
+		"bootstrap": "lerna bootstrap && npm install",
+		"build": "lerna exec -- rollup -c ../../rollup.config.js --silent",
 		"ci:coverage": "jest --collectCoverageFrom='src/**/*.ts' --coverage --runInBand --silent --ci",
 		"ci:lint": "tsc --pretty -p . --noemit && tslint -p .",
 		"ci:lint:commits": "commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}",
@@ -73,7 +73,7 @@
 		"lint:fix": "tslint -p . --fix --force",
 		"postpack": "rm -f oclif.manifest.json",
 		"posttest": "tslint -p . -t stylish",
-		"prebuild": "(shx rm -r dist .rpt2_cache types) || true",
+		"prebuild": "(shx rm -r packages/*/dist packages/*/.rpt2_cache packages/*/types) || true",
 		"prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
 		"prepublishOnly": "npm run build",
 		"prestart": "npm run prebuild",
@@ -82,14 +82,13 @@
 		"release:as": "standard-version --skip.commit --skip.tag --release-as",
 		"release:ok": "standard-version --sign --commit-all --skip.bump --skip.changelog",
 		"release:validate": "commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)",
-		"start": "rollup -c -w",
+		"start": "lerna exec --no-bail -- rollup -c ../../rollup.config.js --watch",
 		"test": "jest --watch",
 		"test:once": "jest",
 		"test:coverage": "jest --collectCoverageFrom='src/**/*.ts' --coverage",
 		"version": "oclif-dev readme && git add README.md"
 	},
-	"dependencies": {
-		"@obot/cli": "file:packages/cli",
-		"@obot/lib": "file:packages/library"
+	"optionalDependencies": {
+		"@obot/cli": "file:packages/cli"
 	}
 }
