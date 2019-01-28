@@ -17,7 +17,7 @@ modify(rootConfig.plugins)
 		readline: resolve("./src/shim-readline")
 		// 🤔 I"m still uncertain if I need to shim the readline or the stdin/stdout
 	})
-).before("babel")
+).before("node-resolve")
 
 export default {
 	input: "src/index.ts",

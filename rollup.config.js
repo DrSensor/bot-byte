@@ -7,10 +7,8 @@ import {logger} from "@rollup/log"
 import {rm, mv} from "shelljs"
 import {sync as rmEmptyDir} from "delete-empty"
 
-import commonjs from "rollup-plugin-commonjs"
 import nodeResolve from "rollup-plugin-node-resolve"
 import json from "rollup-plugin-json"
-import babel from "rollup-plugin-babel"
 import typescript from "rollup-plugin-typescript2"
 
 const log = logger({timestamp: true})
@@ -90,7 +88,6 @@ export default {
 	plugins: [
 		lernaInfo,
 		json(),
-		babel(),
 		nodeResolve(),
 		typescript({
 			exclude: ["test/**"],

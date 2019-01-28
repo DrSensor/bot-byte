@@ -17,7 +17,7 @@
 	},
 	"include": [
 		"packages/**/src",
-		"packages/**/test",
+		"packages/**/tests",
 		"index.d.ts"
 	],
 	"exclude": [

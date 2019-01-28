@@ -4,6 +4,7 @@
 *-error.log
 /.nyc_output
 dist
+/coverage
 /lib
 types
 /tmp
