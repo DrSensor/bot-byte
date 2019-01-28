@@ -2,8 +2,8 @@
   "name": "@obot/lib",
   "version": "1.0.0",
   "description": "An abstraction layer for creating Byteball chatbot",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.mjs",
   "types": "types/index.d.ts",
   "files": [
     "bin",

@@ -4,19 +4,32 @@
 import {dirname, resolve, parse} from "path"
 import {sync as glob} from "globby"
 import {logger} from "@rollup/log"
+import {rm, mv} from "shelljs"
+import {sync as rmEmptyDir} from "delete-empty"
 
 import commonjs from "rollup-plugin-commonjs"
 import nodeResolve from "rollup-plugin-node-resolve"
 import json from "rollup-plugin-json"
 import babel from "rollup-plugin-babel"
 import typescript from "rollup-plugin-typescript2"
+
 const log = logger({timestamp: true})
 const {LERNA_PACKAGE_NAME, LERNA_ROOT_PATH, ROLLUP_WATCH} = process.env
 
+let numOutput, count = 0
 const lernaInfo = {
 	name: "lerna-info",
-	buildStart: () => log.info(`start building ${LERNA_PACKAGE_NAME} 🚧`),
+	buildStart: input => {
+		rm("-rf", "dist", ".rpt2_cache", "types")
+		log.info(`start building ${LERNA_PACKAGE_NAME} 🚧`)
+	},
 	generateBundle: output => log.pass(`finish building ${LERNA_PACKAGE_NAME} as ${output.format.toUpperCase()} module 🏁`),
+	writeBundle: result => {
+		if (numOutput <= ++count) {
+			mv("types/*/src/*", "types")
+			rmEmptyDir("types")
+		}
+	},
 	renderError: error => log.fail(error.message + ' ❌')
 }
 
@@ -31,7 +44,7 @@ const splice = (items, name, ...item) => ({
 export const pkg = require(resolve(process.cwd(), "package.json"))
 export const pkgRoot = require(resolve(LERNA_ROOT_PATH, "package.json"))
 
-export const mapInput = inputs => {
+export function mapInput(inputs) {
 	const result = {}
 	for (const key in inputs) {
 		if (!key.includes("*")) Object.assign(result, {[key]: inputs[key]})
@@ -46,18 +59,21 @@ export const mapInput = inputs => {
 	return result
 }
 
-export const mapOutput = outputs => outputs.map(output => {
-	const ext = output.format === "es" ? "mjs" : "js"
-	const dist = output.format === "es" ? pkg.module : pkg.main
-	const subdir = outputs.length > 1 ? output.format : ''
-	return {
-		dir: resolve(dirname(dist), subdir),
-		// TODO: try https://github.com/rollup/rollup/issues/2336 when merged
-		chunkFileNames: `chunks/[name]-[hash].${ext}`,
-		entryFileNames: `[name].${ext}`,
-		...output
-	}
-})
+export function mapOutput(outputs) {
+	numOutput = outputs.length
+	return outputs.map(output => {
+		const ext = output.format === "es" ? "mjs" : "js"
+		const dist = output.format === "es" ? pkg.module : pkg.main
+		const subdir = outputs.length > 1 ? output.format : ''
+		return {
+			dir: resolve(dirname(dist), subdir),
+			// TODO: try https://github.com/rollup/rollup/issues/2336 when merged
+			chunkFileNames: `chunks/[name]-[hash].${ext}`,
+			entryFileNames: `[name].${ext}`,
+			...output
+		}
+	})
+}
 
 export const modify = plugins => ({
 	plug: (...plugin) => ({

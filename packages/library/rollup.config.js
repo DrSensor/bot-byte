@@ -25,6 +25,6 @@ export default {
 		{exports: "named", format: "cjs"},
 		{exports: "named", format: "es"},
 	]),
-	external: id => /^ocore$|^bitcore/.test(id),
+	external: id => /^ocore|^bitcore/.test(id),
 	...rootConfig
 }
