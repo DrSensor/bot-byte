@@ -35,11 +35,10 @@ jobs:
     steps:
       - checkout
       - <<: *restore_cache
-      - <<: *manage_dependencies
-      - save_cache:
+      - run: npm ci && npx lerna bootstrap
+      - save_cache: # I hope they supprot globbing/wildcard pattern :cry:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
             - /root/.npm
   analysis:
     docker:
@@ -61,6 +60,7 @@ jobs:
       - run:
           name: Validate commit messages
           command: npx commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}
+          when: always
   #endregion
 
   #region CROSS-BUILD

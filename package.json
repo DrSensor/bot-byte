@@ -12,6 +12,7 @@
 		"@babel/preset-typescript": "^7.1.0",
 		"@commitlint/cli": "^7.2.1",
 		"@commitlint/config-conventional": "^7.1.2",
+		"@obot/cli": "file:packages/cli",
 		"@oclif/tslint": "^3.1.1",
 		"@rollup/log": "^0.1.0",
 		"@types/jest": "^23.3.13",
@@ -59,28 +60,17 @@
 	"scripts": {
 		"bootstrap": "npm install && lerna bootstrap",
 		"build": "lerna exec -- rollup -c --silent",
-		"ci:coverage": "jest --collectCoverageFrom='src/**/*.ts' --coverage --runInBand --silent --ci",
-		"ci:lint": "tsc --pretty -p . --noemit && tslint -p .",
-		"ci:lint:commits": "commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}",
-		"ci:release": "conventional-github-releaser -p angular",
-		"ci:test": "jest --runInBand --silent --ci",
 		"lint": "(tsc --pretty -p . --noemit || true) && tslint -p . --force",
-		"lint:commits": "commitlint --to=$(git rev-parse HEAD)",
 		"lint:fix": "tslint -p . --fix --force",
 		"postpack": "rm -f oclif.manifest.json",
 		"posttest": "tslint -p . -t stylish",
-		"prepack": "npm run build",
 		"predocs": "typedoc packages/library/src",
 		"docs": "opn docs/index.html",
 		"prepublishOnly": "npm run build",
 		"release": "lerna version --no-push --no-git-tag-version --yes",
 		"release:ok": "lerna version",
-		"release:validate": "commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)",
 		"start": "lerna exec --no-bail -- rollup -c --silent --watch",
 		"test": "jest --watch",
 		"test:coverage": "jest --collectCoverageFrom='packages/*/src/**/*.ts' --coverage"
-	},
-	"optionalDependencies": {
-		"@obot/cli": "file:packages/cli"
 	}
 }
