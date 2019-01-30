@@ -35,11 +35,11 @@ jobs:
     steps:
       - checkout
       - <<: *restore_cache
-      - run: npm ci && npx lerna bootstrap
+      - run: npm ci --prefer-offline && npx lerna bootstrap
       - save_cache: # I hope they supprot globbing/wildcard pattern :cry:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - /root/.npm
+            - ~/.npm
   analysis:
     docker:
       - image: circleci/node:latest
@@ -52,7 +52,7 @@ jobs:
           command: npm run lint
       - run:
           name: Run Security Check.
-          command: npx lerna exec --no-bail -- npm audit --quiet
+          command: npx lerna exec --no-bail -- npm audit --quiet --audit-level high
       - run:
           name: Found security issue! Check if it's fixable or just have low severity.
           command: npx lerna exec --no-bail -- npm audit fix --quiet
