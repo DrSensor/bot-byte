@@ -10,6 +10,7 @@ import {sync as rmEmptyDir} from "delete-empty"
 import nodeResolve from "rollup-plugin-node-resolve"
 import json from "rollup-plugin-json"
 import typescript from "rollup-plugin-typescript2"
+import babel from "rollup-plugin-babel"
 
 const log = logger({timestamp: true})
 const {LERNA_PACKAGE_NAME, LERNA_ROOT_PATH, ROLLUP_WATCH} = process.env
@@ -24,7 +25,7 @@ const lernaInfo = {
 	generateBundle: output => log.pass(`finish building ${LERNA_PACKAGE_NAME} as ${output.format.toUpperCase()} module 🏁`),
 	writeBundle: result => {
 		if (numOutput <= ++count) {
-			mv("types/*/src/*", "types")
+			if (!ROLLUP_WATCH) mv("types/*/src/*", "types")
 			rmEmptyDir("types")
 		}
 	},
@@ -88,8 +89,13 @@ export default {
 	plugins: [
 		lernaInfo,
 		json(),
-		nodeResolve(),
-		typescript({
+		ROLLUP_WATCH && babel({
+			root: LERNA_ROOT_PATH,
+			cwd: process.cwd(),
+			extensions: [".ts"]
+		}),
+		nodeResolve({extensions: [".ts"]}),
+		!ROLLUP_WATCH && typescript({
 			exclude: ["test/**"],
 			tsconfig: resolve(LERNA_ROOT_PATH, "tsconfig.json"),
 			// cacheRoot: `${require("temp-dir")}/.rpt2_cache`, // enable this if it's difficult to read the packages structure
