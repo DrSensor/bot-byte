@@ -27,6 +27,13 @@ tests: &tests
     - <<: *build
     - <<: *unit_tests
 
+who_am_i: &who_am_i
+  run:
+    name: Tell the CI who I am
+    command: |
+      git config --global user.email $GIT_EMAIL
+      git config --global user.name $GIT_USERNAME
+
 jobs:
   #region PREPARATION
   dependency_cache:
@@ -116,10 +123,12 @@ jobs:
           command: npx commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)
       - run: npm run build && npx lerna exec --no-bail -- npm pack
       - run: npm run predocs && tar cvzf docs-$CIRCLE_TAG.tgz docs
+      - <<: *who_am_i
       - run:
           name: Draft Github release
-          # TODO: change to lerna (MAYBE)
-          command: GH_RELEASE_GITHUB_API_TOKEN=$GH_TOKEN npx gh-release --draft --assets $(ls -m packages/*/*.tgz | tr -d ' ') --yes
+          command: | # TODO: change to lerna (MAYBE)
+            sudo su -c 'sudo npm i -g DrSensor/gh-release'
+            GH_RELEASE_GITHUB_API_TOKEN=$GH_TOKEN gh-release --draft --assets $(ls -m packages/*/*.tgz | tr -d ' ') --yes
   publish:
     docker:
       - image: circleci/node:latest
