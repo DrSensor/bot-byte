@@ -4,7 +4,7 @@
 			"excludeFiles": "*.config.js",
 			"files": "*.js",
 			"options": {
-				"parser": "babylon",
+				"parser": "babel",
 				"singleQuote": true,
 				"bracketSpacing": true
 			}

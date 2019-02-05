@@ -3,32 +3,53 @@
  */
 import {dirname, resolve, parse} from "path"
 import {sync as glob} from "globby"
-import pkg from "./package.json"
-import prc from "./.prettierrc.json"
+import {logger} from "@rollup/log"
+import {rm, mv} from "shelljs"
+import {sync as rmEmptyDir} from "delete-empty"
 
-import commonjs from "rollup-plugin-commonjs"
 import nodeResolve from "rollup-plugin-node-resolve"
 import json from "rollup-plugin-json"
-import alias from "rollup-plugin-alias"
-import run from "rollup-plugin-run"
-import babel from "rollup-plugin-babel"
-import prettier from "rollup-plugin-prettier"
 import typescript from "rollup-plugin-typescript2"
+import babel from "rollup-plugin-babel"
+
+const log = logger({timestamp: true})
+const {LERNA_PACKAGE_NAME, LERNA_ROOT_PATH, ROLLUP_WATCH} = process.env
+
+let numOutput, count = 0
+const lernaInfo = {
+	name: "lerna-info",
+	buildStart: input => {
+		rm("-rf", "dist", ".rpt2_cache", "types")
+		log.info(`start building ${LERNA_PACKAGE_NAME} 🚧`)
+	},
+	generateBundle: output => log.pass(`finish building ${LERNA_PACKAGE_NAME} as ${output.format.toUpperCase()} module 🏁`),
+	writeBundle: result => {
+		if (numOutput <= ++count) {
+			if (!ROLLUP_WATCH) mv("types/*/src/*", "types")
+			rmEmptyDir("types")
+		}
+	},
+	renderError: error => log.fail(error.message + ' ❌')
+}
+
+const splice = (items, name, ...item) => ({
+	at: (idx, del=0) => {
+		items.splice(items.indexOf(name) + idx, del, ...item)
+		return {chain: obj => obj}
+	}
+})
 
 // #region helper
-let {overrides, ...options} = prc
-const prettierrc = {
-	options: options,
-	files: files => overrides.find(p => p.files === files).options
-}
-const dev = process.env.ROLLUP_WATCH === 'true'
-const mapInput = inputs => {
+export const pkg = require(resolve(process.cwd(), "package.json"))
+export const pkgRoot = require(resolve(LERNA_ROOT_PATH, "package.json"))
+
+export function mapInput(inputs) {
 	const result = {}
 	for (const key in inputs) {
-		if (!key.includes('*')) Object.assign(result, {[key]: inputs[key]})
+		if (!key.includes("*")) Object.assign(result, {[key]: inputs[key]})
 		else { // support glob pattern
-			const [prefix, suffix] = key.split('*')
-			const input = glob(inputs[key]).reduce(
+			const [prefix, suffix] = key.split("*")
+			const input = glob(resolve(process.cwd(), inputs[key])).reduce(
 				(obj, item) => (obj[`${prefix}/${parse(item).name}${suffix}`] = item, obj), {}
 			)
 			Object.assign(result, input)
@@ -36,53 +57,56 @@ const mapInput = inputs => {
 	}
 	return result
 }
-// #endregion
 
-// Default Configuration
-const configure = ({input, output, watch, ...others}) => ({
-	input,
-	output: Object.assign({
-		format: "cjs",
-		exports: "named"
-	}, output),
+export function mapOutput(outputs) {
+	numOutput = outputs.length
+	return outputs.map(output => {
+		const ext = output.format === "es" ? "mjs" : "js"
+		const dist = output.format === "es" ? pkg.module : pkg.main
+		const subdir = outputs.length > 1 ? output.format : ''
+		return {
+			dir: resolve(dirname(dist), subdir),
+			// TODO: try https://github.com/rollup/rollup/issues/2336 when merged
+			chunkFileNames: `chunks/[name]-[hash].${ext}`,
+			entryFileNames: `[name].${ext}`,
+			...output
+		}
+	})
+}
+
+export const modify = plugins => ({
+	plug: (...plugin) => ({
+		before: name => splice(plugins, name, ...plugin).at(0).chain(modify(plugins)),
+		after: name => splice(plugins, name, ...plugin).at(1).chain(modify(plugins)),
+		replacing: name => splice(plugins, name, ...plugin).at(0, 1).chain(modify(plugins)),
+	})
+})
+// #endregion helper
+
+// Rollup Configuration
+export default {
 	watch: {clearScreen: false},
-	// 👇 I wonder if I can convert it as a plugin like rollup-plugin-auto-external 🤔
-	external: id => /ocore/.test(id) || /bitcore/.test(id) || /@oclif/.test(id),
 	plugins: [
-		dev && run({ bin: pkg.bin[pkg.name] }),
+		lernaInfo,
 		json(),
-		alias({
-			resolve: [".ts"],
-			readline: resolve("./src/shim-readline")
-			// 🤔 I'm still uncertain if I need to shim the readline or the stdin/stdout
+		ROLLUP_WATCH && babel({
+			root: LERNA_ROOT_PATH,
+			cwd: process.cwd(),
+			extensions: [".ts"]
 		}),
-		babel(),
-		nodeResolve(),
-		commonjs({ignore: id => id !== "readline"}),
-		typescript({
+		nodeResolve({extensions: [".ts"]}),
+		!ROLLUP_WATCH && typescript({
 			exclude: ["test/**"],
+			tsconfig: resolve(LERNA_ROOT_PATH, "tsconfig.json"),
+			// cacheRoot: `${require("temp-dir")}/.rpt2_cache`, // enable this if it's difficult to read the packages structure
 			tsconfigOverride: {
 				compilerOptions: {
-					module: "esnext"
+					module: "esnext",
+					declaration: true,
+					declarationDir: `${process.cwd()}/types`
 				}
 			},
 			useTsconfigDeclarationDir: true
 		}),
-		prettier(prettierrc.files("*.js")),
 	],
-	...others,
-})
-
-// Rollup Configuration
-export default [
-	configure({
-		input: mapInput({
-			index: "src/index.ts",
-			"commands/*": "src/commands/*.ts"
-		}),
-		output: {
-			dir: dirname(pkg.main),
-			chunkFileNames: "chunks/[name]-[hash].js"
-		},
-	})
-]
+}

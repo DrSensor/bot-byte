@@ -1,6 +1,10 @@
 {
 	"extends": ["tslint-config-prettier", "@oclif/tslint"],
 	"linterOptions": {
-		"exclude": ["node_modules/**", "examples/**"]
+		"exclude": [
+			"node_modules/**",
+			"packages/**/node_modules/**",
+			"examples/**"
+		]
 	}
 }

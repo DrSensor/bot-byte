@@ -10,10 +10,20 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"declaration": true,
-		"declarationDir": "types",
-		"typeRoots": ["node_modules/@types"]
+		"typeRoots": [
+			"node_modules/@types",
+			"packages/**/node_modules/@types"
+		]
 	},
-	"include": ["src", "test", "index.d.ts"],
-	"exclude": ["node_modules", "examples"]
+	"include": [
+		"packages/**/src",
+		"packages/**/tests",
+		"index.d.ts"
+	],
+	"exclude": [
+		"packages/**/node_modules",
+		"packages/**/types",
+		"node_modules",
+		"examples"
+	]
 }

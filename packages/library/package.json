@@ -1,0 +1,30 @@
+{
+  "name": "@obot/lib",
+  "version": "0.2.1",
+  "description": "An abstraction layer for creating Byteball chatbot",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.mjs",
+  "types": "types/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "types"
+  ],
+  "repository": "github:DrSensor/bot-byte",
+  "homepage": "https://drsensor.github.io/bot-byte",
+  "keywords": [
+    "obyte",
+    "chatbot",
+    "library"
+  ],
+  "author": "Fahmi Akbar Wildana @DrSensor",
+  "license": "MIT",
+  "dependencies": {
+    "ocore": "github:byteball/ocore",
+    "strict-event-emitter-types": "^2.0.0",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "headless-obyte": "github:byteball/headless-obyte"
+  }
+}

@@ -1,36 +1,31 @@
-# @prettier
-version: 2
+version: 2.1
 
-who_am_i: &who_am_i
-  run:
-    name: Tell the CI who I am
-    command: |
-      git config --global user.email $GIT_EMAIL
-      git config --global user.name $GIT_USERNAME
+restore_cache: &restore_cache
+  restore_cache:
+    key: dependency-cache-{{ checksum "package-lock.json" }}
 
-install_submodule: &install_submodule
+manage_dependencies: &manage_dependencies
   run:
-    name: Prepare example repo
-    command: |
-      git submodule sync --recursive
-      git submodule update --init --recursive
+    name: Install/Manage dependencies
+    command: npm ci && npx lerna bootstrap
+
+build: &build
+  run:
+    name: Build/Compile project
+    command: npm run build
 
 unit_tests: &unit_tests
+  run:
+    name: Run unit tests.
+    command: npm run test:coverage -- --runInBand --silent --ci
+
+tests: &tests
   steps:
     - checkout
-    - <<: *who_am_i
-    - <<: *install_submodule
-    - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
-    - run:
-        name: NPM Rebuild
-        command: npm install --quiet
-    - run:
-        name: NPM Build
-        command: npm run build
-    - run:
-        name: Run unit tests.
-        command: npm run ci:test
+    - <<: *restore_cache
+    - <<: *manage_dependencies
+    - <<: *build
+    - <<: *unit_tests
 
 jobs:
   #region PREPARATION
@@ -39,34 +34,33 @@ jobs:
       - image: circleci/node:latest
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: Install Dependencies
-          command: npm install --quiet
-      - save_cache:
+      - <<: *restore_cache
+      - run: npm ci --prefer-offline && npx lerna bootstrap
+      - save_cache: # I hope they supprot globbing/wildcard pattern :cry:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
+            - ~/.npm
   analysis:
     docker:
       - image: circleci/node:latest
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: NPM Rebuild
-          command: npm install --quiet
+      - <<: *restore_cache
+      - <<: *manage_dependencies
       - run:
           name: Run linting.
-          command: npm run ci:lint
+          command: npm run lint
       - run:
-          name: Run NSP Security Check.
-          command: npm audit --quiet || true
+          name: Run Security Check.
+          command: npx lerna exec --no-bail -- npm audit --quiet --audit-level high
       - run:
-          name: Validate Commit Messages
-          command: npm run ci:lint:commits
+          name: Found security issue! Check if it's fixable or just have low severity.
+          command: npx lerna exec --no-bail -- npm audit fix --quiet
+          when: on_fail
+      - run:
+          name: Validate commit messages
+          command: npx commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}
+          when: always
   #endregion
 
   #region CROSS-BUILD
@@ -75,69 +69,57 @@ jobs:
       - image: circleci/node:latest
     steps:
       - checkout
-      - <<: *who_am_i
-      # - <<: *install_submodule
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - <<: *restore_cache
+      - <<: *manage_dependencies
+      - <<: *build
+      - <<: *unit_tests
       - run:
-          name: NPM Rebuild
-          command: npm install --quiet
-      - run:
-          name: NPM Build
-          command: npm run build
-      # - run:
-      #     name: Run unit tests.
-      #     command: npm run ci:coverage
-      # - run:
-      #     name: Submit coverage data to codecov.
-      #     command: |
-      #       if [[ -z $CIRCLE_PULL_REQUEST ]]; then
-      #         bash <(curl -s https://codecov.io/bash)
-      #       fi
-      #     when: on_success
+          name: Submit coverage data to codecov.
+          command: |
+            if [[ -z $CIRCLE_PULL_REQUEST ]]; then
+              bash <(curl -s https://codecov.io/bash)
+            fi
+          when: on_success
   node10-latest:
     docker:
       - image: circleci/node:10
-    <<: *unit_tests
+    <<: *tests
+  node8-latest:
+    docker:
+      - image: circleci/node:8
+    <<: *tests
   #endregion
 
-  #region DOCUMENTATION
-  document:
+  #region RELEASE VERSION
+  deploy-docs:
     docker:
       - image: circleci/node:latest
     steps:
       - checkout
-      - <<: *who_am_i
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - <<: *restore_cache
+      - <<: *manage_dependencies
       - run:
-          name: NPM Rebuild
-          command: npm install --quiet
+          name: Generate documentations
+          command: npm run predocs
       - run:
-          name: Generate Typedoc documentations
-          command: npm run ci:typedoc
-      - run:
-          name: Push the documentations to Github gh-pages
-          command: npm run ci:push-docs
-  #endregion
-
-  #region RELEASE VERSION
+          name: Push the documentations to Github pages
+          command: npx gh-pages --dist docs
   draft:
     docker:
       - image: circleci/node:latest
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: NPM Rebuild
-          command: npm install --quiet
+      - <<: *restore_cache
+      - <<: *manage_dependencies
       - run:
           name: Validate Commit Messages
-          command: npm run release:validate
+          command: npx commitlint --from=$(git describe --tags --abbrev=0) --to=$(git rev-parse HEAD)
+      - run: npm run build && npx lerna exec --no-bail -- npm pack
+      - run: npm run predocs && tar cvzf docs-$CIRCLE_TAG.tgz docs
       - run:
-          name: Draft Releases to Github
-          command: npm run ci:release
+          name: Draft Github release
+          # TODO: change to lerna (MAYBE)
+          command: GH_RELEASE_GITHUB_API_TOKEN=$GH_TOKEN npx gh-release --draft --assets $(ls -m packages/*/*.tgz | tr -d ' ') --yes
   publish:
     docker:
       - image: circleci/node:latest
@@ -146,14 +128,9 @@ jobs:
       - run:
           name: set npm TOKEN
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: NPM Rebuild
-          command: npm install --quiet
-      - run:
-          name: Publish to NPM
-          command: npm publish --verbose
+      - <<: *restore_cache
+      - <<: *manage_dependencies
+      - run: npx lerna publish from-git --no-git-reset --yes
   #endregion
 
 workflows:
@@ -163,6 +140,8 @@ workflows:
       #region PREPARATION
       - dependency_cache:
           filters:
+            branches:
+              ignore: gh-pages
             tags:
               only: /.*/
       - analysis:
@@ -180,49 +159,50 @@ workflows:
           filters:
             tags:
               only: /.*/
-      # - node10-latest:
-      #     requires:
-      #       - analysis
-      #       # - node6-latest
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - node8-latest:
+          requires:
+            - analysis
+          filters:
+            tags:
+              only: /.*/
+      - node10-latest:
+          requires:
+            - analysis
+          filters:
+            tags:
+              only: /.*/
       #endregion
 
-      #region DOCUMENTATION [just temporary test]
-      # - document:
-      #     requires:
-      #       - node-latest
-      #       # - node10-latest
-      #     filters:
-      #       tags:
-      #         only: /^v\d+[.]\d+[.]\d+$/
-      #       branches:
-      #         ignore: /.*/
-      #endregion
 
       #region RELEASE VERSION
       - draft:
           requires:
             - node-latest
             - analysis
-            # - node10-latest
           filters:
             tags:
-              only: /^v\d+[.]\d+[.]\d+$/
+              only: /^v\d+[.]\d+[.]\d+(-\d+|-\w+|)$/
             branches:
               ignore: /.*/
-      - check github Releases!:
+      - deploy-docs:
+          requires:
+            - publish package?
+          filters:
+            tags:
+              only: /^v\d+[.]\d+[.]\d+$/ # don't support pre-release
+            branches:
+              ignore: /.*/
+      - publish package?:
           type: approval
           requires:
             - draft
           filters:
             tags:
-              only: /^v\d+[.]\d+[.]\d+$/
+              only: /^v\d+[.]\d+[.]\d+(-\d+|-\w+|)$/
       - publish:
           requires:
-            - check github Releases!
+            - publish package?
           filters:
             tags:
-              only: /^v\d+[.]\d+[.]\d+$/
+              only: /^v\d+[.]\d+[.]\d+(-\d+|-\w+|)$/
       #endregion

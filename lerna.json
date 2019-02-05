@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "command": {
+    "publish": {
+      "conventionalCommits": true,
+      "message": "chore(release): %s [skip ci]"
+    }
+  },
+  "version": "0.2.1"
+}
