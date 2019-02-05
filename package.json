@@ -68,8 +68,7 @@
 		"predocs": "typedoc packages/library/src",
 		"docs": "opn docs/index.html",
 		"prepublishOnly": "npm run build",
-		"release": "lerna version --no-push --no-git-tag-version --yes",
-		"release:ok": "lerna version",
+		"release": "lerna version",
 		"start": "lerna exec --no-bail -- rollup -c --silent --watch",
 		"test": "jest --watch",
 		"test:coverage": "jest --collectCoverageFrom='packages/*/src/**/*.ts' --coverage"
