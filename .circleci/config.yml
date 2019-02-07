@@ -108,6 +108,7 @@ jobs:
       - run:
           name: Generate documentations
           command: npm run predocs
+      - <<: *who_am_i
       - run:
           name: Push the documentations to Github pages
           command: npx gh-pages --dist docs
